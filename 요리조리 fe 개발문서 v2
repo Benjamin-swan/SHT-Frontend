@@ -1,0 +1,305 @@
+# 요리조리 — 프론트엔드 개발 문서 v2
+
+> MVP 기준 | CSS 작업 없이 연동 동작 확인 우선 | 페이지별 컴포넌트화
+
+---
+
+## 개발 원칙
+
+- **1차 목표**: 버튼 클릭 → 백엔드 API 정상 동작 확인
+- **CSS/UI 작업 없음**: 스타일링은 연동 완료 후 진행
+- **컴포넌트화 필수**: 페이지별로 컴포넌트 분리하여 코드 가독성 확보
+- **피그마 시안 없이 개발 선행**: 연동 결과물 확인 후 추후 UI 보완
+
+---
+
+## 1. FE 기술 스택
+
+| 항목 | 기술 | 비고 |
+|------|------|------|
+| 프레임워크 | React 18 + Vite | 빠른 번들링, HMR |
+| 스타일링 | Tailwind CSS | CSS 작업은 2차에서 진행 |
+| 라우팅 | React Router v6 | 3페이지 SPA |
+| API 통신 | axios | FastAPI 연동 |
+| 상태관리 | useState + Context API | MVP 수준, Redux 불필요 |
+| 로컬 저장 | localStorage | 최근 본 레시피 (FE-8) |
+| 환경변수 | .env (VITE_) | API 베이스 URL |
+
+---
+
+## 2. FE 폴더 구조
+
+```
+frontend/
+├── public/
+├── src/
+│   ├── main.jsx                  # 앱 진입점
+│   ├── App.jsx                   # 라우터 설정
+│   ├── pages/
+│   │   ├── InputPage.jsx         # 식재료 입력 (FE-1,2,3)
+│   │   ├── RecipeListPage.jsx    # 추천 레시피 목록 (FE-4,6,7,8)
+│   │   └── RecipeDetailPage.jsx  # 레시피 상세 (FE-5,6)
+│   ├── components/
+│   │   ├── IngredientButton.jsx  # 식재료 버튼 (FE-1,2)
+│   │   ├── FreshnessButton.jsx   # 유통기한 버튼 (FE-3)
+│   │   ├── RecipeCard.jsx        # 레시피 카드 (FE-6)
+│   │   ├── RecipeDetail.jsx      # 상세 레시피 (FE-5,6)
+│   │   └── RecentRecipes.jsx     # 최근 본 레시피 (FE-8)
+│   ├── api/
+│   │   └── client.js             # axios 인스턴스 + API 함수 모음
+│   ├── hooks/
+│   │   └── useRecentRecipes.js   # localStorage 훅 (FE-8)
+│   └── constants/
+│       └── ingredients.js        # 빈출 식재료 10종 상수
+├── .env                          # 환경변수 (git 제외)
+├── .env.example                  # 환경변수 예시 (git 포함)
+└── package.json
+```
+
+---
+
+## 3. 페이지 라우팅
+
+```
+/                  →  InputPage         (식재료 입력)
+/recipes           →  RecipeListPage    (추천 목록)
+/recipes/:id       →  RecipeDetailPage  (레시피 상세)
+```
+
+---
+
+## 4. 환경변수 설정
+
+### frontend/.env
+```
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+> `.env`는 반드시 `.gitignore`에 추가할 것  
+> `.env.example`은 git에 포함하여 팀 공유
+
+---
+
+## 5. CORS 설정 (백엔드 참고)
+
+`backend/app/main.py`에 아래 미들웨어 추가:
+
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Vite 기본 포트
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+---
+
+## 6. API 명세서
+
+### 6-1. GET /ingredients
+> 빈출 식재료 목록 반환 (FE-1)
+
+**Response 200**
+```json
+{
+  "ingredients": [
+    { "id": "uuid", "name": "계란", "category": "단백질" },
+    { "id": "uuid", "name": "김치", "category": "발효" }
+  ]
+}
+```
+
+---
+
+### 6-2. POST /recipes/recommend
+> 식재료 기반 레시피 추천 (FE-4)
+
+**Request**
+```json
+{
+  "ingredients": ["계란", "김치"],
+  "session_id": "uuid"
+}
+```
+
+**Response 200**
+```json
+{
+  "recipes": [
+    {
+      "id": "uuid",
+      "title": "김치볶음밥",
+      "cooking_time_min": 15,
+      "matched_ingredients": ["계란", "김치"],
+      "source": "db",
+      "is_llm_generated": false
+    }
+  ]
+}
+```
+
+> `source`: `"db"` (매칭) | `"llm"` (Gemini 생성)
+
+---
+
+### 6-3. GET /recipes/{id}
+> 레시피 상세 조회 (FE-5,6)
+
+**Response 200**
+```json
+{
+  "id": "uuid",
+  "title": "김치볶음밥",
+  "cooking_time_min": 15,
+  "instructions": "1. 팬을 달군다\n2. 김치를 볶는다...",
+  "ingredients": [
+    { "name": "계란", "quantity": "2개", "is_optional": false },
+    { "name": "김치", "quantity": "200g", "is_optional": false }
+  ],
+  "source_url": "https://...",
+  "is_llm_generated": false
+}
+```
+
+---
+
+### 6-4. POST /logs/event
+> 클릭 이벤트 로그 (FE-7)
+
+**Request**
+```json
+{
+  "session_id": "uuid",
+  "event_type": "recipe_click",
+  "recipe_id": "uuid",
+  "metadata": {}
+}
+```
+
+> `event_type`: `"recipe_click"` | `"ingredient_input"` | `"recommend_request"`
+
+**Response 200**
+```json
+{ "ok": true }
+```
+
+---
+
+## 7. FE-BE 연동 흐름
+
+```
+[InputPage]
+식재료 버튼 클릭 → 선택 상태 토글 (FE-1,2)
+유통기한 버튼 선택 (FE-3)
+레시피 조회 버튼 클릭
+    ↓
+POST /recipes/recommend  ← 연동 확인 포인트 1
+    ↓
+[RecipeListPage]
+레시피 카드 목록 렌더링 (FE-4,6)
+카드 클릭 → POST /logs/event  ← 연동 확인 포인트 2
+localStorage에 최근 본 레시피 저장 (FE-8)
+    ↓
+GET /recipes/:id  ← 연동 확인 포인트 3
+    ↓
+[RecipeDetailPage]
+상세 레시피 텍스트 렌더링 (FE-5,6)
+```
+
+---
+
+## 8. 페이지별 컴포넌트 작업 명세
+
+> CSS 없이 동작 확인만 하는 것이 목표  
+> 각 컴포넌트는 console.log 또는 브라우저 Network 탭으로 연동 확인
+
+---
+
+### [InputPage.jsx] — FE-1, 2, 3
+
+| 컴포넌트 | 역할 | 연동 |
+|----------|------|------|
+| `IngredientButton` | 식재료 버튼 클릭/해제 상태 토글 | 없음 (로컬 state) |
+| `FreshnessButton` | 싱싱 / 임박 선택 버튼 | 없음 (로컬 state) |
+| 레시피 조회 버튼 | 선택 재료 수집 후 요청 트리거 | POST /recipes/recommend |
+
+**동작 확인 기준**
+- [ ] 버튼 클릭 시 선택/해제 상태가 state로 관리되는가
+- [ ] 유통기한 버튼 선택값이 state에 반영되는가
+- [ ] 조회 버튼 클릭 시 Network 탭에 POST /recipes/recommend 요청이 찍히는가
+- [ ] 요청 body에 선택한 재료 목록이 정확히 담기는가
+
+---
+
+### [RecipeListPage.jsx] — FE-4, 6, 7, 8
+
+| 컴포넌트 | 역할 | 연동 |
+|----------|------|------|
+| `RecipeCard` | 레시피 제목, 조리시간 텍스트 렌더링 | GET /recipes/{id} 이동 |
+| `RecentRecipes` | 최근 본 레시피 목록 | localStorage |
+
+**동작 확인 기준**
+- [ ] POST /recipes/recommend 응답값이 카드 목록으로 렌더링되는가
+- [ ] 카드 클릭 시 /recipes/:id로 페이지 이동이 되는가
+- [ ] 카드 클릭 시 Network 탭에 POST /logs/event 요청이 찍히는가
+- [ ] 로그 요청 실패 시 페이지 이동이 중단되지 않는가 (silent fail)
+- [ ] 클릭한 레시피가 localStorage에 저장되는가
+
+---
+
+### [RecipeDetailPage.jsx] — FE-5, 6
+
+| 컴포넌트 | 역할 | 연동 |
+|----------|------|------|
+| `RecipeDetail` | 요리명, 재료, 조리 순서 텍스트 렌더링 | GET /recipes/{id} |
+
+**동작 확인 기준**
+- [ ] URL의 :id로 GET /recipes/{id} 요청이 가는가
+- [ ] 응답값(요리명, 재료, 조리 순서)이 화면에 텍스트로 렌더링되는가
+- [ ] 로딩 중 / 에러 상태가 텍스트로 표시되는가
+
+---
+
+## 9. 개발 순서 (권장)
+
+```
+1. Vite + React + Tailwind 프로젝트 초기화
+2. .env 설정 + axios client.js 작성
+3. App.jsx 라우터 3개 설정
+4. InputPage — 버튼 state 관리 + POST /recipes/recommend 연동
+5. RecipeListPage — 응답 렌더링 + 카드 클릭 이벤트 연동
+6. RecipeDetailPage — GET /recipes/{id} 연동 + 텍스트 렌더링
+7. POST /logs/event silent fail 처리
+8. useRecentRecipes 훅 + localStorage 연동
+```
+
+---
+
+## 10. axios client.js 기본 구조
+
+```javascript
+// src/api/client.js
+import axios from 'axios'
+
+const client = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+})
+
+export const getIngredients = () =>
+  client.get('/ingredients')
+
+export const recommendRecipes = (ingredients, session_id) =>
+  client.post('/recipes/recommend', { ingredients, session_id })
+
+export const getRecipeDetail = (id) =>
+  client.get(`/recipes/${id}`)
+
+export const logEvent = (payload) =>
+  client.post('/logs/event', payload).catch(() => {})  // silent fail
+
+export default client
+```
