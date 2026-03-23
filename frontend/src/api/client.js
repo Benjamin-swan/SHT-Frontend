@@ -13,18 +13,19 @@ const client = axios.create({
 export const getIngredients = () =>
   client.get('/ingredients')
 
-// POST /recipes/recommend — 선택한 재료 기반 레시피 추천 요청
-export const recommendRecipes = (ingredients, session_id) =>
-  client.post('/recipes/recommend', { ingredients, session_id })
+// POST /recipes/recommend — 선택한 재료 이름 목록으로 레시피 추천 요청
+// ingredient_names: string[] — 백엔드가 DB에서 UUID로 변환합니다.
+export const recommendRecipes = (ingredient_names) =>
+  client.post('/recipes/recommend', { ingredient_names })
 
 // GET /recipes/:id — 특정 레시피 상세 정보 조회
 export const getRecipeDetail = (id) =>
   client.get(`/recipes/${id}`)
 
-// POST /logs/event — 사용자 클릭 이벤트 로그 전송
+// POST /logs/recipe-click — 레시피 카드 클릭 이벤트 로그 전송
 // .catch(() => {}) : 로그 전송 실패해도 에러를 무시합니다 (silent fail)
 // 로그 실패가 사용자 경험에 영향을 주면 안 되기 때문입니다.
-export const logEvent = (payload) =>
-  client.post('/logs/event', payload).catch(() => {})
+export const logRecipeClick = (session_id, recipe_id) =>
+  client.post('/logs/recipe-click', { session_id, recipe_id }).catch(() => {})
 
 export default client

@@ -53,10 +53,8 @@ function InputPage() {
     try {
       // POST /recipes/recommend 요청
       // Array.from()으로 Set을 배열로 변환합니다.
-      const response = await recommendRecipes(
-        Array.from(selectedIngredients),
-        crypto.randomUUID(), // 세션 ID: 매 요청마다 고유값 생성
-      )
+      // 백엔드가 이름 → UUID 변환을 내부적으로 처리합니다.
+      const response = await recommendRecipes(Array.from(selectedIngredients))
 
       // 레시피 목록 페이지로 이동하면서 응답 데이터를 state로 전달합니다.
       navigate('/recipes', { state: { recipes: response.data.recipes } })

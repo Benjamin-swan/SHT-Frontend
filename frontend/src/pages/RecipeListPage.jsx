@@ -7,7 +7,7 @@
 //   3. 카드 클릭 시 로그 이벤트를 전송하고 상세 페이지로 이동합니다.
 import { useLocation, useNavigate } from 'react-router-dom'
 import RecipeCard from '../components/RecipeCard'
-import { logEvent } from '../api/client'
+import { logRecipeClick } from '../api/client'
 import useRecentRecipes from '../hooks/useRecentRecipes'
 
 function RecipeListPage() {
@@ -29,13 +29,8 @@ function RecipeListPage() {
     })
 
     // FE-7: 클릭 이벤트 로그 전송 (silent fail — 실패해도 이동은 진행됩니다)
-    // logEvent 내부에서 이미 .catch(() => {}) 처리가 되어 있습니다.
-    await logEvent({
-      session_id: crypto.randomUUID(),
-      event_type: 'recipe_click',
-      recipe_id: recipe.id,
-      metadata: {},
-    })
+    // logRecipeClick 내부에서 이미 .catch(() => {}) 처리가 되어 있습니다.
+    await logRecipeClick(crypto.randomUUID(), recipe.id)
 
     // FE-4: 상세 페이지로 이동
     navigate(`/recipes/${recipe.id}`)
