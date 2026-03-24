@@ -29,8 +29,8 @@ function RecipeListPage() {
     })
 
     // FE-7: 클릭 이벤트 로그 전송 (silent fail — 실패해도 이동은 진행됩니다)
-    // logRecipeClick 내부에서 이미 .catch(() => {}) 처리가 되어 있습니다.
-    await logRecipeClick(crypto.randomUUID(), recipe.id)
+    // session_id는 logRecipeClick 내부에서 localStorage를 통해 읽습니다.
+    await logRecipeClick(recipe.id)
 
     // FE-4: 상세 페이지로 이동
     navigate(`/recipes/${recipe.id}`)

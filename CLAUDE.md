@@ -279,6 +279,42 @@ export default client
 - 최대 5개까지 표시, 새로고침 후에도 유지
 - InputPage 하단에 최근 본 레시피 섹션 배치
 
+### SHT-FE-9 — 식재료 직접 입력 검색 칸 (InputPage)
+- 텍스트 입력으로 식재료를 직접 검색하고 선택할 수 있는 UI 제공
+- 입력 확정 시 `POST /logs/event` 호출 (`input_method: "direct"`)
+- 이 시점에 세션이 DB(`user_sessions`)에 등록되어 이후 recipe-click 로그 정상 저장 가능
+
+**Success Criteria**
+- [ ] 검색 입력창에 텍스트를 입력하면 일치하는 식재료가 드롭다운 또는 목록으로 표시된다
+- [ ] 항목 선택 시 선택된 재료 state에 추가된다
+- [ ] 선택 즉시 `POST /logs/event`가 호출된다 (`input_method: "direct"`)
+- [ ] 호출 성공 시 세션이 DB에 등록된다 (Network 탭에서 201 응답 확인)
+- [ ] 이후 레시피 클릭 시 `POST /logs/recipe-click`이 500 없이 201로 응답한다
+- [ ] 로그 이벤트 실패 시 silent fail — 사용자에게 에러 노출 없음
+
+**TODO**
+- [ ] `InputPage`에 텍스트 입력 `<input>` 컴포넌트 추가
+- [ ] 입력값으로 `GET /ingredients` 응답 목록을 필터링하는 로직 작성
+- [ ] 항목 선택 시 `logIngredientEvent(ingredient_id, "direct")` 호출 함수 작성
+- [ ] `src/api/client.js`에 `logIngredientEvent` 함수 추가
+- [ ] `browser_uuid`를 localStorage에서 읽거나 최초 1회 생성하는 유틸 함수 작성
+- [ ] 선택된 재료가 버튼 선택 목록과 중복되지 않도록 state 통합 처리
+
+### SHT-FE-10 — 선택된 재료 X 버튼으로 개별 삭제 (InputPage)
+- 선택된 재료 목록에서 각 재료 옆 X 버튼 클릭 시 해당 재료를 선택 해제합니다.
+- 버튼 선택 및 검색 직접 입력으로 추가된 재료 모두 적용됩니다.
+
+**Success Criteria**
+- [ ] 선택된 재료가 텍스트만이 아닌 태그/칩(chip) 형태로 표시된다
+- [ ] 각 태그에 X 버튼이 있으며 클릭 시 해당 재료가 목록에서 제거된다
+- [ ] X 클릭 후 버튼 UI에서도 해당 재료의 선택 상태가 해제된다 (동기화)
+- [ ] 모든 재료 삭제 시 '없음' 상태로 돌아간다
+
+**TODO**
+- [ ] `InputPage`의 선택 현황 섹션을 칩(chip) 목록 형태로 교체
+- [ ] 각 칩에 X 버튼(`<button>`) 추가
+- [ ] X 클릭 시 `handleIngredientClick(name)` 또는 별도 remove 핸들러 호출
+
 ---
 
 ## CORS 설정 (백엔드 참고용)
