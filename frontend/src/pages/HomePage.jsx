@@ -17,10 +17,10 @@ const DIFFICULTY_STYLE = {
 
 // 최근 본 레시피가 없을 때 보여줄 플레이스홀더 카드 데이터
 const PLACEHOLDER_RECIPES = [
-  { id: 'p1', title: '닭볶음탕', cooking_time_min: 25, kcal: 320, difficulty: 'EASY' },
-  { id: 'p2', title: '김치볶음밥', cooking_time_min: 15, kcal: 210, difficulty: 'EASY' },
-  { id: 'p3', title: '두부조림', cooking_time_min: 35, kcal: 280, difficulty: 'NORMAL' },
-  { id: 'p4', title: '크림 치즈밥', cooking_time_min: 45, kcal: 450, difficulty: 'HARD' },
+  { id: 'p1', title: '닭볶음탕', cooking_time_min: 25, difficulty: 'EASY' },
+  { id: 'p2', title: '김치볶음밥', cooking_time_min: 15, difficulty: 'EASY' },
+  { id: 'p3', title: '두부조림', cooking_time_min: 35, difficulty: 'NORMAL' },
+  { id: 'p4', title: '크림 치즈밥', cooking_time_min: 45, difficulty: 'HARD' },
 ]
 
 const MAX_INGREDIENTS = 10
@@ -82,7 +82,7 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col pt-[77px]">
       <NavBar />
 
       {/* ── Hero 섹션 ─────────────────────────────── */}
@@ -196,16 +196,8 @@ function HomePage() {
                 onClick={() => navigate(`/recipes/${recipe.id}`)}
                 className="flex-shrink-0 w-48 bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100"
               >
-                {/* 난이도 뱃지 */}
-                <span
-                  className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-2"
-                  style={{ backgroundColor: diff.bg, color: diff.text }}
-                >
-                  {diff.label}
-                </span>
-
                 {/* 레시피 제목 */}
-                <p className="font-bold text-[#1C1C15] text-sm mb-2 truncate">{recipe.title}</p>
+                <p className="font-bold text-[#1C1C15] text-sm mb-2 truncate">{recipe.title ? recipe.title.replace(/\s*\(.*?\)\s*/g, '') : ''}</p>
 
                 {/* 조리시간 + kcal */}
                 <div className="flex flex-col gap-0.5 text-xs text-[#78716C]">
@@ -216,16 +208,6 @@ function HomePage() {
                         <circle cx="12" cy="12" r="10" /><path strokeLinecap="round" d="M12 6v6l4 2" />
                       </svg>
                       {recipe.cooking_time_min} mins
-                    </span>
-                  )}
-                  {recipe.kcal && (
-                    <span className="flex items-center gap-1">
-                      {/* 불꽃 아이콘 */}
-                      <svg className="w-3.5 h-3.5 text-[#63610F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-                      </svg>
-                      {recipe.kcal} kcal
                     </span>
                   )}
                 </div>

@@ -19,8 +19,7 @@ function Footer() {
             </div>
             <p className="text-sm font-semibold text-[#1C1C15] mb-2">Better cooking, simplified</p>
             <p className="text-xs text-[#78716C] leading-relaxed">
-              요리조리는 당신의 냉장고 속 재료를 가장 똑똑하게 활용할 수 있도록 큐레이션 경험합니다나 나눠 있는 식생활,
-              즐거운 요리 경험을 선사합니다.
+              냉장고 속 재료로 오늘 뭐 먹을지 고민될 때, 요리조리가 딱 맞는 레시피를 찾아드립니다.
             </p>
             {/* 공유 아이콘 */}
             <button className="mt-4 text-[#78716C] hover:text-[#7A0000] transition-colors">

@@ -7,8 +7,20 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import AddIngredientModal from '../components/AddIngredientModal'
-import { getIngredients } from '../api/client'
-import { INGREDIENTS } from '../constants/ingredients'
+import { getSessionIngredients, updateIngredientFreshness } from '../api/client'
+
+// localStorage에 저장할 키
+const FRIDGE_STORAGE_KEY = 'fridge_ingredients'
+
+// 오늘 기준 n일 뒤 날짜를 YYYY-MM-DD(로컬 시간 기준)로 반환
+function getDateOffsetStr(offsetDays) {
+  const d = new Date()
+  d.setDate(d.getDate() + offsetDays)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
 
 const ACTIVE_TAB_STYLE = { bg: '#FEFA99', text: '#63610F' }
 
@@ -155,15 +167,23 @@ function FridgePage() {
   const [isManageMode, setIsManageMode] = useState(false)
   // 관리 모드에서 선택된 재료 (수정 패널 열기용)
   const [editingIngredient, setEditingIngredient] = useState(null)
+  // 세션 가져오기 진행 중 여부
+  const [importingSession, setImportingSession] = useState(false)
 
+  // 마운트 시 localStorage에서 냉장고 재료 복원
   useEffect(() => {
-    getIngredients()
-      .then((res) => {
-        const data = Array.isArray(res.data) ? res.data : res.data.ingredients ?? []
-        setIngredients(data.length > 0 ? data : INGREDIENTS)
-      })
-      .catch(() => setIngredients(INGREDIENTS))
+    try {
+      const saved = localStorage.getItem(FRIDGE_STORAGE_KEY)
+      if (saved) setIngredients(JSON.parse(saved))
+    } catch {
+      // 파싱 실패 시 빈 배열 유지
+    }
   }, [])
+
+  // ingredients가 바뀔 때마다 localStorage에 저장
+  useEffect(() => {
+    localStorage.setItem(FRIDGE_STORAGE_KEY, JSON.stringify(ingredients))
+  }, [ingredients])
 
   const filteredIngredients = activeCategory === null
     ? ingredients
@@ -195,8 +215,72 @@ function FridgePage() {
         return next
       })
     }
+    // [BE-8] 세션에서 가져온 재료(_eventId 존재)의 expiryDate가 임박(1일 이하)으로 변경됐을 때
+    // 백엔드에 신선도 상태 변경을 silent fail로 전송합니다.
+    if (updated._eventId) {
+      const daysLeft = getDaysLeft(updated.expiryDate)
+      const wasImminentBefore = getDaysLeft(editingIngredient.expiryDate) !== null
+        && getDaysLeft(editingIngredient.expiryDate) > 1
+      if (daysLeft !== null && daysLeft <= 1 && wasImminentBefore) {
+        updateIngredientFreshness(updated._eventId, '임박').catch(() => {})
+      }
+    }
     setEditingIngredient(null)
   }
+
+  // [BE-9] 현재 세션에 기록된 재료를 냉장고로 가져옵니다.
+  // - 이미 냉장고에 있는 재료(이름 기준)는 건너뜁니다.
+  // - 만료된 이벤트는 제외합니다.
+  // - 각 재료에 _eventId를 저장해 두면 BE-8 freshness update에서 사용할 수 있습니다.
+  const handleSessionImport = async () => {
+    const sessionId = localStorage.getItem('session_id')
+    if (!sessionId) return
+    setImportingSession(true)
+    try {
+      const res = await getSessionIngredients(sessionId)
+      const items = Array.isArray(res.data) ? res.data : []
+      
+      setIngredients((prev) => {
+        const existingNames = new Set(prev.map((i) => i.name))
+        
+        let importedEvents = []
+        try {
+          const stored = localStorage.getItem('imported_events_' + sessionId)
+          if (stored) importedEvents = JSON.parse(stored)
+        } catch {}
+        const importedSet = new Set(importedEvents)
+
+        const newItems = items
+          .filter((item) => !item.is_expired && !existingNames.has(item.ingredient_name) && !importedSet.has(item.event_id))
+          .map((item) => ({
+            id: crypto.randomUUID(),
+            _eventId: item.event_id,            // BE-8 freshness 업데이트용
+            name: item.ingredient_name,
+            category: '발효',                   // 세션 응답에 category 없음 → 기타로 기본값
+            expiryDate: getDateOffsetStr(item.freshness_status === '임박' ? 1 : 2),
+          }))
+          
+        if (newItems.length === 0) return prev
+        
+        // 가져온 event_id들을 localStorage에 기록하여 새로고침 시 부활 방지
+        const newEventIds = newItems.map((i) => i._eventId)
+        if (newEventIds.length > 0) {
+          localStorage.setItem('imported_events_' + sessionId, JSON.stringify([...importedEvents, ...newEventIds]))
+        }
+        
+        return [...prev, ...newItems]
+      })
+    } catch (err) {
+      console.error('세션 재료를 불러오는 데 실패했습니다.', err)
+    } finally {
+      setImportingSession(false)
+    }
+  }
+
+  // 컴포넌트 마운트 시 백그라운드에서 자동 수행
+  useEffect(() => {
+    handleSessionImport()
+  }, [])
 
   const handleModalAdd = (ingredient) => {
     setIngredients((prev) => [...prev, ingredient])
@@ -259,7 +343,7 @@ function FridgePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
+    <div className="min-h-screen bg-[#F5F5F5] pt-[77px]">
       <NavBar />
 
       <div className="max-w-2xl mx-auto px-4 py-8">
@@ -268,7 +352,7 @@ function FridgePage() {
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-2xl font-bold text-[#1C1C15]">내 냉장고</h1>
 
-          {/* 우측: 식재료 추가 버튼 + 토글 — 같은 높이로 나란히 */}
+          {/* 우측: (세션 가져오기 버튼) + 식재료 추가 버튼 + 토글 — 같은 높이로 나란히 */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowModal(true)}

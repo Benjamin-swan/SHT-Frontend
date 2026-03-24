@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import FridgePage from './pages/FridgePage'
 import RecipeListPage from './pages/RecipeListPage'
 import RecipeDetailPage from './pages/RecipeDetailPage'
+import SavedPage from './pages/SavedPage'
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
 
         {/* /recipes/:id → 레시피 상세 페이지 */}
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+
+        {/* /saved → 저장된 레시피 (세션 클릭 이력 + localStorage 폴백) */}
+        <Route path="/saved" element={<SavedPage />} />
       </Routes>
     </BrowserRouter>
   )

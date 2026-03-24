@@ -59,4 +59,21 @@ export const logRecipeClick = (recipe_id) => {
   return client.post('/logs/recipe-click', { session_id, recipe_id }).catch(() => {})
 }
 
+// PATCH /logs/event/{event_id}/freshness — 신선도 상태 변경 (싱싱 → 임박)
+// InputPage에서 식재료 로그 생성 후 신선도를 바꾸고 싶을 때 사용합니다.
+// eventId: logIngredientEvent() 응답의 event_id
+export const updateIngredientFreshness = (eventId, freshnessStatus) =>
+  client.patch(`/logs/event/${eventId}/freshness`, { freshness_status: freshnessStatus })
+
+// GET /sessions/{session_id}/ingredients — 세션에 기록된 식재료 목록 조회
+// 신선도, 유효기간, 만료 여부까지 포함된 상세 정보를 반환합니다.
+// sessionId: logIngredientEvent() 응답에서 받아 localStorage에 저장한 session_id
+export const getSessionIngredients = (sessionId) =>
+  client.get(`/sessions/${sessionId}/ingredients`)
+
+// GET /logs/interactions/{session_id} — 세션의 레시피 클릭 이력 조회
+// "저장된 레시피" 페이지에서 백엔드 기반 클릭 이력을 표시할 때 사용합니다.
+export const getInteractionLogs = (sessionId) =>
+  client.get(`/logs/interactions/${sessionId}`)
+
 export default client

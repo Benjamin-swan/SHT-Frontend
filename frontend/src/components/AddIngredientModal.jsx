@@ -2,7 +2,6 @@
 // 나의 냉장고 페이지에서 재료를 직접 입력할 때 나타나는 바텀 시트 모달입니다.
 // 아래에서 위로 슬라이드 업 애니메이션으로 등장하며, 배경은 블러 처리됩니다.
 import { useState, useEffect } from 'react'
-import { createIngredient } from '../api/client'
 
 const CATEGORY_OPTIONS = [
   { label: '곡물·면·빵', value: 'grain' },
@@ -13,11 +12,16 @@ const CATEGORY_OPTIONS = [
   { label: '가공·기타', value: '발효' },
 ]
 
-// 오늘 기준으로 n일 뒤 날짜를 YYYY-MM-DD 형식으로 반환
+// 오늘 기준으로 n일 뒤 날짜를 YYYY-MM-DD 형식으로 반환 (로컬 시간 기준)
+// toISOString()은 UTC를 반환하므로 한국(UTC+9) 오전 0~9시 사이에 호출하면
+// 날짜가 하루 이전으로 잘못 계산됩니다. 로컬 날짜를 직접 포맷합니다.
 function getDateOffsetStr(offsetDays) {
   const d = new Date()
   d.setDate(d.getDate() + offsetDays)
-  return d.toISOString().split('T')[0]
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 function AddIngredientModal({ onClose, onAdd }) {
@@ -26,7 +30,6 @@ function AddIngredientModal({ onClose, onAdd }) {
   // 'fresh' = 싱싱 (+2일), 'imminent' = 임박 (+1일)
   const [freshness, setFreshness] = useState('fresh')
   const [expiryDate, setExpiryDate] = useState(getDateOffsetStr(2))
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   // 슬라이드업 애니메이션 제어 — true가 되면 translateY(0)으로 이동
   const [visible, setVisible] = useState(false)
@@ -49,32 +52,20 @@ function AddIngredientModal({ onClose, onAdd }) {
     setExpiryDate(getDateOffsetStr(type === 'fresh' ? 2 : 1))
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const trimmed = name.trim()
     if (!trimmed) {
       setError('재료 이름을 입력해주세요.')
       return
     }
-    setLoading(true)
-    setError('')
-    try {
-      const res = await createIngredient(trimmed)
-      // 백엔드 응답에 expiryDate가 없을 수 있으므로 로컬 입력값을 병합합니다.
-      onAdd({ ...res.data, expiryDate })
-      handleClose()
-    } catch {
-      // 백엔드 미연동 시 로컬 임시 객체로 대체 — 새로고침 전까지 냉장고에 반영됩니다.
-      const localIngredient = {
-        id: crypto.randomUUID(),
-        name: trimmed,
-        category,
-        expiryDate,   // 사용자가 입력한 소비기한을 함께 전달
-      }
-      onAdd(localIngredient)
-      handleClose()
-    } finally {
-      setLoading(false)
-    }
+    // 백엔드 API 없이 로컬에서 바로 등록 — 사용자가 직접 선택한 카테고리·소비기한 사용
+    onAdd({
+      id: crypto.randomUUID(),
+      name: trimmed,
+      category,
+      expiryDate,
+    })
+    handleClose()
   }
 
   return (
@@ -245,8 +236,7 @@ function AddIngredientModal({ onClose, onAdd }) {
             <div className="flex justify-end pt-2">
               <button
                 onClick={handleSubmit}
-                disabled={loading}
-                className="flex items-center gap-2 font-medium transition-all disabled:opacity-50"
+                className="flex items-center gap-2 font-medium transition-all"
                 style={{
                   background: '#7A0000',
                   borderRadius: '30px',
@@ -261,7 +251,7 @@ function AddIngredientModal({ onClose, onAdd }) {
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
-                {loading ? '등록 중...' : '등록'}
+                등록
               </button>
             </div>
 
