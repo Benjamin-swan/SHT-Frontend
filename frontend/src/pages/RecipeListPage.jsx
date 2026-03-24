@@ -68,11 +68,6 @@ function RecipeListPage() {
                 onClick={() => handleCardClick(recipe)}
                 className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               >
-                {/* 이미지 플레이스홀더 */}
-                <div className="w-full h-36 bg-[#F5F5F5] rounded-xl mb-4 flex items-center justify-center text-[#78716C] text-sm">
-                  이미지 준비 중
-                </div>
-
                 {/* 레시피 제목 */}
                 <h3 className="font-bold text-[#1C1C15] text-base mb-2 line-clamp-1">
                   {recipe.title}

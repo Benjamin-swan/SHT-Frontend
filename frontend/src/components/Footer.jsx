@@ -10,13 +10,12 @@ function Footer() {
         <div className="flex flex-col md:flex-row gap-10 mb-8">
           {/* 왼쪽: 로고 + 소개 */}
           <div className="flex-shrink-0 max-w-xs">
-            <div className="flex items-center gap-1 mb-2">
-              {/* 로고 텍스트 — Yori(빨강) Jori(노랑) */}
-              <span className="text-xl font-bold leading-none">
-                <span className="text-[#7A0000]">Yori</span>
-                <br />
-                <span className="text-[#FEFA99] drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">Jori</span>
-              </span>
+            <div className="mb-2">
+              <img
+                src="/images/yorijori.png"
+                alt="요리조리 로고"
+                className="h-12 w-auto object-contain"
+              />
             </div>
             <p className="text-sm font-semibold text-[#1C1C15] mb-2">Better cooking, simplified</p>
             <p className="text-xs text-[#78716C] leading-relaxed">
@@ -34,30 +33,29 @@ function Footer() {
 
           {/* 오른쪽: 링크 그룹 */}
           <div className="flex gap-16 ml-auto">
-            {/* Explore */}
+            {/* 탐색 */}
             <div>
-              <p className="text-sm font-semibold text-[#1C1C15] mb-3">Explore</p>
+              <p className="text-sm font-semibold text-[#1C1C15] mb-3">탐색</p>
               <ul className="space-y-2 text-sm text-[#78716C]">
-                <li><Link to="/recipes" className="hover:text-[#7A0000] transition-colors">Recipes</Link></li>
-                <li><Link to="/" className="hover:text-[#7A0000] transition-colors">Classes</Link></li>
+                <li><Link to="/recipes" className="hover:text-[#7A0000] transition-colors">레시피</Link></li>
               </ul>
             </div>
-            {/* Support */}
+            {/* 고객지원 */}
             <div>
-              <p className="text-sm font-semibold text-[#1C1C15] mb-3">Support</p>
+              <p className="text-sm font-semibold text-[#1C1C15] mb-3">고객지원</p>
               <ul className="space-y-2 text-sm text-[#78716C]">
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">Help Center</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">Safety Warnings</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">Contact Us</span></li>
+                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">도움말</span></li>
+                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">안전 안내</span></li>
+                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">문의하기</span></li>
               </ul>
             </div>
-            {/* Legal */}
+            {/* 약관 */}
             <div>
-              <p className="text-sm font-semibold text-[#1C1C15] mb-3">Legal</p>
+              <p className="text-sm font-semibold text-[#1C1C15] mb-3">약관</p>
               <ul className="space-y-2 text-sm text-[#78716C]">
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">Terms</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">Privacy</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">Cookie Policy</span></li>
+                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">이용약관</span></li>
+                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">개인정보처리방침</span></li>
+                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">쿠키 정책</span></li>
               </ul>
             </div>
           </div>
