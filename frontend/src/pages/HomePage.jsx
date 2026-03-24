@@ -57,7 +57,7 @@ function HomePage() {
       const recipes = Array.isArray(res.data) ? res.data : (res.data.recipes ?? [])
       navigate('/recipes', { state: { recipes, selectedIngredients: ingredients } })
     } catch {
-      alert('레시피 추천에 실패했습니다. 다시 시도해주세요.')
+      alert('해당 식재료로 레시피를 제작할 수 없습니다.')
     } finally {
       setLoading(false)
     }
@@ -86,10 +86,29 @@ function HomePage() {
           minHeight: '380px',
         }}
       >
-        <p className="text-[#78716C] text-sm mb-1">안녕하세요.</p>
-        <h1 className="text-3xl font-bold text-[#1C1C15] mb-8">
-          오늘은 무슨 요리를 만들까요?
+        {/* 트렌디한 뱃지 (Hook-in) */}
+        <div className="inline-flex items-center gap-2 text-[#7A0000] text-sm font-bold tracking-wide mb-6">
+          <span className="relative flex h-2 w-2 items-center justify-center">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#B02D20] opacity-80"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#7A0000]"></span>
+          </span>
+          AI추천 맛있는 레시피 뚝딱
+        </div>
+
+        {/* 메인 타이틀 (시선 집중 최적화) */}
+        <h1 className="text-[34px] md:text-[44px] leading-[1.3] md:leading-[1.4] font-extrabold text-[#1C1C15] tracking-[-0.02em] mb-5">
+          냉장고 속 재료만 <span className="bg-gradient-to-r from-[#7A0000] to-[#E35D5D] text-transparent bg-clip-text">알려주세요</span><br />
+          오늘을 위한 <span className="text-[#7A0000] relative inline-block z-10 w-fit">
+            최적의 레시피
+            {/* 반응형 형광펜 밑줄 효과 */}
+            <span className="absolute bottom-1.5 md:bottom-2 left-0 w-full h-[30%] bg-[#FEFA99] -z-10 rounded-sm rounded-br-2xl opacity-90"></span>
+          </span>
         </h1>
+
+        {/* 서브 타이틀 (한 줄 표시 및 반응형) */}
+        <p className="text-[#605A55] text-sm md:text-base font-medium mb-10 mx-auto leading-relaxed break-keep whitespace-nowrap">
+          버려지는 식재료 없이, 매일 새롭고 맛있는 한 끼를 완성하세요.
+        </p>
 
         {/* 검색창 */}
         <div className="w-full max-w-lg">

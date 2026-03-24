@@ -84,7 +84,7 @@ function RecipeListPage() {
           {/* 레시피 결과 */}
           {recipes.length === 0 ? (
             <div className="text-center py-16 flex flex-col items-center gap-4">
-              <p className="text-[#78716C] text-sm">추천할 레시피가 없습니다.</p>
+              <p className="text-[#78716C] text-sm">해당 식재료로 레시피를 제작할 수 없습니다.</p>
               <button
                 onClick={() => navigate('/')}
                 className="bg-[#7A0000] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#600000] transition-colors shadow-md"

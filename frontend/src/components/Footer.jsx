@@ -43,18 +43,18 @@ function Footer() {
             <div>
               <p className="text-sm font-semibold text-[#1C1C15] mb-3">고객지원</p>
               <ul className="space-y-2 text-sm text-[#78716C]">
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">도움말</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">안전 안내</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">문의하기</span></li>
+                <li><Link to="/support/help" className="hover:text-[#7A0000] transition-colors">도움말</Link></li>
+                <li><Link to="/support/safety" className="hover:text-[#7A0000] transition-colors">안전 안내</Link></li>
+                <li><Link to="/support/contact" className="hover:text-[#7A0000] transition-colors">문의하기</Link></li>
               </ul>
             </div>
             {/* 약관 */}
             <div>
               <p className="text-sm font-semibold text-[#1C1C15] mb-3">약관</p>
               <ul className="space-y-2 text-sm text-[#78716C]">
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">이용약관</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">개인정보처리방침</span></li>
-                <li><span className="hover:text-[#7A0000] cursor-pointer transition-colors">쿠키 정책</span></li>
+                <li><Link to="/legal/terms" className="hover:text-[#7A0000] transition-colors">이용약관</Link></li>
+                <li><Link to="/legal/privacy" className="hover:text-[#7A0000] transition-colors">개인정보처리방침</Link></li>
+                <li><Link to="/legal/cookie" className="hover:text-[#7A0000] transition-colors">쿠키 정책</Link></li>
               </ul>
             </div>
           </div>

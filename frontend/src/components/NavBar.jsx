@@ -35,8 +35,8 @@ function NavBar() {
               <Link
                 key={to}
                 to={to}
-                className="relative pb-1 transition-colors hover:text-[#7A0000]"
-                style={{ color: isActive ? '#7A0000' : '#57534E', fontWeight: isActive ? 600 : 500 }}
+                className={`relative pb-1 transition-colors hover:text-[#7A0000] font-semibold`}
+                style={{ color: isActive ? '#7A0000' : '#57534E' }}
               >
                 {label}
                 <span
