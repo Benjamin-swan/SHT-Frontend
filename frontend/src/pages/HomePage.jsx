@@ -8,13 +8,6 @@ import Footer from '../components/Footer'
 import useRecentRecipes from '../hooks/useRecentRecipes'
 import { recommendRecipes } from '../api/client'
 
-// 난이도별 뱃지 색상
-const DIFFICULTY_STYLE = {
-  EASY:   { bg: '#D1FAE5', text: '#065F46', label: '● EASY' },
-  NORMAL: { bg: '#7A0000', text: '#FFFFFF', label: '● NORMAL' },
-  HARD:   { bg: '#1C1C15', text: '#FFFFFF', label: '● HARD' },
-}
-
 // 최근 본 레시피가 없을 때 보여줄 플레이스홀더 카드 데이터
 const PLACEHOLDER_RECIPES = [
   { id: 'p1', title: '닭볶음탕', cooking_time_min: 25, difficulty: 'EASY' },
@@ -151,13 +144,24 @@ function HomePage() {
           )}
 
           {/* 레시피 조회 버튼 */}
-          <button
-            onClick={handleSearch}
-            disabled={ingredients.length === 0 || loading}
-            className="mt-8 bg-[#FEFA99] text-[#7A0000] font-bold text-base px-10 py-3 rounded-full hover:brightness-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
-          >
-            {loading ? '조회 중...' : '레시피 조회 🍴'}
-          </button>
+          {loading ? (
+            <div className="mt-8 flex flex-col items-center gap-3">
+              {/* 원형 스피너: border-t 색상만 진하게 → 회전하면서 스피너처럼 보임 */}
+              <div className="w-11 h-11 rounded-full border-4 border-[#FEFA99] border-t-[#7A0000] animate-spin" />
+              <p className="text-sm text-[#78716C] animate-pulse">레시피를 찾고 있어요...</p>
+            </div>
+          ) : (
+            <button
+              onClick={handleSearch}
+              disabled={ingredients.length === 0}
+              className="mt-8 mx-auto bg-[#FEFA99] text-[#7A0000] font-bold text-base px-10 py-3 rounded-full hover:brightness-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm flex items-center gap-2"
+            >
+              레시피 조회
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8"/>
+              </svg>
+            </button>
+          )}
         </div>
       </section>
 
@@ -189,7 +193,6 @@ function HomePage() {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {displayRecipes.map((recipe) => {
-            const diff = DIFFICULTY_STYLE[recipe.difficulty] ?? DIFFICULTY_STYLE.EASY
             return (
               <div
                 key={recipe.id}

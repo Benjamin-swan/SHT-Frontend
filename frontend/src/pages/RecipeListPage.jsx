@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
 import useRecentRecipes from '../hooks/useRecentRecipes'
-import { logRecipeClick } from '../api/client'
+import { logRecipeInteraction } from '../api/client'
 
 function RecipeListPage() {
   const location = useLocation()
@@ -22,7 +22,7 @@ function RecipeListPage() {
       title: recipe.title,
       cooking_time_min: recipe.cooking_time_min
     })
-    logRecipeClick(recipe.id)
+    logRecipeInteraction(recipe.id, 'recipe_click')
     navigate(`/recipes/${recipe.id}`)
   }
 
@@ -86,10 +86,10 @@ function RecipeListPage() {
             <div className="text-center py-16 flex flex-col items-center gap-4">
               <p className="text-[#78716C] text-sm">추천할 레시피가 없습니다.</p>
               <button
-                onClick={() => navigate('/fridge')}
+                onClick={() => navigate('/')}
                 className="bg-[#7A0000] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[#600000] transition-colors shadow-md"
               >
-                냉장고로 돌아가기
+                레시피 검색
               </button>
             </div>
           ) : (

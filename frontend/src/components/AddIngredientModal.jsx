@@ -2,6 +2,7 @@
 // 나의 냉장고 페이지에서 재료를 직접 입력할 때 나타나는 바텀 시트 모달입니다.
 // 아래에서 위로 슬라이드 업 애니메이션으로 등장하며, 배경은 블러 처리됩니다.
 import { useState, useEffect } from 'react'
+import { createIngredient, logIngredientEvent } from '../api/client'
 
 const CATEGORY_OPTIONS = [
   { label: '곡물·면·빵', value: 'grain' },
@@ -31,6 +32,7 @@ function AddIngredientModal({ onClose, onAdd }) {
   const [freshness, setFreshness] = useState('fresh')
   const [expiryDate, setExpiryDate] = useState(getDateOffsetStr(2))
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   // 슬라이드업 애니메이션 제어 — true가 되면 translateY(0)으로 이동
   const [visible, setVisible] = useState(false)
 
@@ -52,20 +54,35 @@ function AddIngredientModal({ onClose, onAdd }) {
     setExpiryDate(getDateOffsetStr(type === 'fresh' ? 2 : 1))
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = name.trim()
     if (!trimmed) {
       setError('재료 이름을 입력해주세요.')
       return
     }
-    // 백엔드 API 없이 로컬에서 바로 등록 — 사용자가 직접 선택한 카테고리·소비기한 사용
-    onAdd({
-      id: crypto.randomUUID(),
-      name: trimmed,
-      category,
-      expiryDate,
-    })
-    handleClose()
+    
+    setLoading(true)
+    setError('')
+    try {
+      const res = await createIngredient(trimmed)
+      onAdd({
+        id: res.data.id,
+        name: res.data.name,
+        category: res.data.category, // 백엔드 LLM 자동 분류 카테고리
+        expiryDate,
+      })
+      // 백엔드 이벤트 로깅 (silent fail)
+      logIngredientEvent(res.data.id).catch(() => {})
+      handleClose()
+    } catch (err) {
+      if (err.response?.status === 422) {
+        setError(err.response.data.detail || '식용 식재료로 인식되지 않습니다.')
+      } else {
+        setError('재료 등록에 실패했습니다.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -232,10 +249,10 @@ function AddIngredientModal({ onClose, onAdd }) {
               />
             </div>
 
-            {/* 등록 버튼 */}
             <div className="flex justify-end pt-2">
               <button
                 onClick={handleSubmit}
+                disabled={loading}
                 className="flex items-center gap-2 font-medium transition-all"
                 style={{
                   background: '#7A0000',
@@ -246,12 +263,18 @@ function AddIngredientModal({ onClose, onAdd }) {
                   color: '#FFFFFF',
                   border: 'none',
                   boxShadow: '0px 10px 20px -5px rgba(122,0,0,0.3)',
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer',
                 }}
               >
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                등록
+                {loading ? (
+                  <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                ) : (
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+                {loading ? '등록 중...' : '등록'}
               </button>
             </div>
 

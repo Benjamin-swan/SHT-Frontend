@@ -40,23 +40,33 @@ export const createIngredient = (name) =>
 
 // POST /logs/event — 식재료 직접 입력 이벤트 로그 전송 (SHT-FE-9)
 // 백엔드가 익명 사용자 + 세션을 자동 생성하고, 생성된 session_id를 응답으로 반환합니다.
-// 응답의 session_id를 localStorage에 저장하면 이후 recipe-click 로그에서 사용할 수 있습니다.
-export const logIngredientEvent = (ingredient_id) =>
-  client.post('/logs/event', {
+// 응답의 session_id를 localStorage에 저장하면 이후 상호작용 로그에서 사용할 수 있습니다.
+export const logIngredientEvent = (ingredient_id) => {
+  const session_id = localStorage.getItem('session_id') || undefined
+  return client.post('/logs/event', {
     browser_uuid: getBrowserUUID(),
     ingredient_id,
     input_method: 'direct',
     freshness_status: '싱싱',
+    session_id
+  }).then(res => {
+    if (res.data.session_id) {
+      localStorage.setItem('session_id', res.data.session_id)
+    }
+    return res
   })
+}
 
-// POST /logs/recipe-click — 레시피 카드 클릭 이벤트 로그 전송
-// session_id를 localStorage에서 읽습니다.
-// logIngredientEvent를 먼저 호출해야 session_id가 DB에 등록됩니다.
+// POST /logs/interaction — 레시피 상호작용(클릭, 저장 등) 로그 전송
+// session_id를 localStorage에서 읽거나, 없으면 생성합니다.
 // .catch(() => {}) : 로그 전송 실패해도 에러를 무시합니다 (silent fail)
-export const logRecipeClick = (recipe_id) => {
-  const session_id = localStorage.getItem('session_id')
-  if (!session_id) return Promise.resolve() // 세션 미등록 시 로그 생략
-  return client.post('/logs/recipe-click', { session_id, recipe_id }).catch(() => {})
+export const logRecipeInteraction = (recipe_id, event_type = "recipe_click") => {
+  let session_id = localStorage.getItem('session_id')
+  if (!session_id) {
+    session_id = crypto.randomUUID()
+    localStorage.setItem('session_id', session_id)
+  }
+  return client.post('/logs/interaction', { session_id, recipe_id, event_type }).catch(() => {})
 }
 
 // PATCH /logs/event/{event_id}/freshness — 신선도 상태 변경 (싱싱 → 임박)

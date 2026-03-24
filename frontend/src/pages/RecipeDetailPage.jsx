@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
-import { getRecipeDetail } from '../api/client'
+import { getRecipeDetail, logRecipeInteraction } from '../api/client'
 
 function RecipeDetailPage() {
   const { id } = useParams()
@@ -47,6 +47,7 @@ function RecipeDetailPage() {
 
     if (isSaved) {
       localStorage.setItem('liked_recipes', JSON.stringify(savedList.filter(item => item.id !== id)))
+      logRecipeInteraction(id, 'recipe_unsave').catch(() => {})
     } else {
       const displayTitle = recipe.title ? recipe.title.replace(/\s*\(.*?\)\s*/g, '') : '제목 없음'
       localStorage.setItem('liked_recipes', JSON.stringify([...savedList, {
@@ -54,6 +55,7 @@ function RecipeDetailPage() {
         title: displayTitle,
         savedAt: new Date().toISOString()
       }]))
+      logRecipeInteraction(id, 'recipe_save').catch(() => {})
     }
     setIsSaved(!isSaved)
   }
@@ -90,7 +92,7 @@ function RecipeDetailPage() {
 
   const parsedData = parseInstructions(recipe.instructions)
   const instructionsList = parsedData.steps
-  const displayTip = parsedData.tip || recipe.chef_tip || '이 요리의 조향과 시간 조절이 핵심입니다. 차분히 순서대로 따라오시면 누구나 성공할 수 있습니다!'
+  const displayTip = parsedData.tip || '이 요리의 조향과 시간 조절이 핵심입니다. 차분히 순서대로 따라오시면 누구나 성공할 수 있습니다!'
   const difficulty = recipe.difficulty || 'EASY'
   const displayTitle = recipe.title ? recipe.title.replace(/\s*\(.*?\)\s*/g, '') : ''
 
@@ -147,7 +149,7 @@ function RecipeDetailPage() {
 
           {/* 설명 */}
           <p className="text-sm md:text-[15px] leading-relaxed text-[#3B3B3B]">
-            {recipe.description || '한국인의 소울푸드, 누구나 실패 없이 만들 수 있는 황금 레시피입니다.'}
+            {'한국인의 소울푸드, 누구나 실패 없이 만들 수 있는 황금 레시피입니다.'}
           </p>
         </section>
 
