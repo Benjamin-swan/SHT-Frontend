@@ -36,19 +36,19 @@ export const getRecipeDetail = (id) =>
 
 // POST /ingredients — DB에 없는 신규 식재료를 LLM으로 분류 후 등록 (SHT-BE-1)
 // is_new: true → 새로 등록됨, false → 기존에 있던 재료
-export const createIngredient = (name) =>
-  client.post('/ingredients/', { name })
+export const createIngredient = (name, category) =>
+  client.post('/ingredients/', { name, category })
 
 // POST /logs/event — 식재료 직접 입력 이벤트 로그 전송 (SHT-FE-9)
 // 백엔드가 익명 사용자 + 세션을 자동 생성하고, 생성된 session_id를 응답으로 반환합니다.
 // 응답의 session_id를 localStorage에 저장하면 이후 상호작용 로그에서 사용할 수 있습니다.
-export const logIngredientEvent = (ingredient_id) => {
+export const logIngredientEvent = (ingredient_id, freshness_status = '싱싱') => {
   const session_id = localStorage.getItem('session_id') || undefined
   return client.post('/logs/event', {
     browser_uuid: getBrowserUUID(),
     ingredient_id,
     input_method: 'direct',
-    freshness_status: '싱싱',
+    freshness_status,
     session_id
   }).then(res => {
     if (res.data.session_id) {

@@ -48,7 +48,7 @@ function AddIngredientModal({ onClose, onAdd }) {
     setTimeout(onClose, 300) // transition duration과 맞춤
   }
 
-  // 유통기한 버튼 클릭 시 날짜 자동 설정
+  // 소비기한 버튼 클릭 시 날짜 자동 설정
   const handleFreshness = (type) => {
     setFreshness(type)
     setExpiryDate(getDateOffsetStr(type === 'fresh' ? 2 : 1))
@@ -64,15 +64,15 @@ function AddIngredientModal({ onClose, onAdd }) {
     setLoading(true)
     setError('')
     try {
-      const res = await createIngredient(trimmed)
+      const res = await createIngredient(trimmed, category)
       onAdd({
         id: res.data.id,
         name: res.data.name,
-        category: res.data.category, // 백엔드 LLM 자동 분류 카테고리
+        category: category, // 사용자가 선택한 카테고리 반영
         expiryDate,
       })
       // 백엔드 이벤트 로깅 (silent fail)
-      logIngredientEvent(res.data.id).catch(() => {})
+      logIngredientEvent(res.data.id, freshness === 'fresh' ? '싱싱' : '임박').catch(() => {})
       handleClose()
     } catch (err) {
       if (err.response?.status === 422) {
@@ -143,7 +143,7 @@ function AddIngredientModal({ onClose, onAdd }) {
             {/* 식재료 이름 */}
             <div>
               <p className="text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: '#1C1C15' }}>
-                식자재 이름
+                식재료 이름
               </p>
               <input
                 type="text"
@@ -169,7 +169,7 @@ function AddIngredientModal({ onClose, onAdd }) {
             {/* 식재료 카테고리 */}
             <div>
               <p className="text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: '#1C1C15' }}>
-                식자재 카테고리
+                식재료 카테고리
               </p>
               <div className="flex flex-wrap gap-2">
                 {CATEGORY_OPTIONS.map((cat) => {
@@ -194,10 +194,10 @@ function AddIngredientModal({ onClose, onAdd }) {
               </div>
             </div>
 
-            {/* 유통기한 */}
+            {/* 소비기한 */}
             <div>
               <p className="text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: '#1C1C15' }}>
-                유통기한
+                소비기한
               </p>
               {/* 싱싱 / 임박 토글 */}
               <div className="flex gap-2.5 mb-3">
