@@ -84,21 +84,21 @@ function NavBar() {
           </button>
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="w-9 h-9 flex flex-col items-center justify-center gap-[5px]"
-            aria-label="메뉴 열기"
+            className="w-9 h-9 flex items-center justify-center"
+            aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
           >
-            <span
-              className="block w-5 h-0.5 bg-[#1C1C15] transition-all duration-200"
-              style={{ transform: menuOpen ? 'translateY(6px) rotate(45deg)' : 'none' }}
-            />
-            <span
-              className="block w-5 h-0.5 bg-[#1C1C15] transition-all duration-200"
-              style={{ opacity: menuOpen ? 0 : 1 }}
-            />
-            <span
-              className="block w-5 h-0.5 bg-[#1C1C15] transition-all duration-200"
-              style={{ transform: menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }}
-            />
+            {menuOpen ? (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1C1C15" strokeWidth="2" strokeLinecap="round">
+                <line x1="4" y1="4" x2="16" y2="16" />
+                <line x1="16" y1="4" x2="4" y2="16" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1C1C15" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6" x2="17" y2="6" />
+                <line x1="3" y1="10" x2="17" y2="10" />
+                <line x1="3" y1="14" x2="17" y2="14" />
+              </svg>
+            )}
           </button>
         </div>
       </div>

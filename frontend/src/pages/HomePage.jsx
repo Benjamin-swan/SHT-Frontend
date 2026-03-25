@@ -96,7 +96,7 @@ function HomePage() {
         </div>
 
         {/* 메인 타이틀 (시선 집중 최적화) */}
-        <h1 className="text-[34px] md:text-[44px] leading-[1.3] md:leading-[1.4] font-extrabold text-[#1C1C15] tracking-[-0.02em] mb-5">
+        <h1 className="text-[28px] sm:text-[34px] md:text-[44px] leading-[1.35] md:leading-[1.4] font-extrabold text-[#1C1C15] tracking-[-0.02em] mb-5">
           냉장고 속 재료만 <span className="bg-gradient-to-r from-[#7A0000] to-[#E35D5D] text-transparent bg-clip-text">알려주세요</span><br />
           오늘을 위한 <span className="text-[#7A0000] relative inline-block z-10 w-fit">
             최적의 레시피
@@ -105,8 +105,8 @@ function HomePage() {
           </span>
         </h1>
 
-        {/* 서브 타이틀 (한 줄 표시 및 반응형) */}
-        <p className="text-[#605A55] text-sm md:text-base font-medium mb-10 mx-auto leading-relaxed break-keep whitespace-nowrap">
+        {/* 서브 타이틀 (반응형) */}
+        <p className="text-[#605A55] text-sm md:text-base font-medium mb-10 mx-auto leading-relaxed break-keep max-w-[90vw] md:whitespace-nowrap">
           버려지는 식재료 없이, 매일 새롭고 맛있는 한 끼를 완성하세요.
         </p>
 
@@ -245,8 +245,8 @@ function HomePage() {
           className="rounded-3xl py-10 px-10 flex items-center justify-between gap-8 relative overflow-hidden"
           style={{ backgroundColor: '#FEFA99' }}
         >
-          {/* 왼쪽: 냄비 SVG 일러스트 */}
-          <div className="flex-shrink-0">
+          {/* 왼쪽: 냄비 SVG 일러스트 — 모바일에서 숨김 */}
+          <div className="hidden md:block flex-shrink-0">
             <svg width="160" height="160" viewBox="0 0 272 272" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M156.142 244.771C72.2218 265.333 37.2073 213.916 30.4928 181.096L252.646 126.666C259.609 160.702 243.69 223.321 156.142 244.771Z" fill="#D74949"/>
               <path d="M252.646 126.665C259.514 160.232 215.35 199.628 154.004 214.659C92.658 229.689 37.3603 214.663 30.493 181.096C23.6257 147.529 67.7893 108.133 129.135 93.1021C190.481 78.0716 245.779 93.0985 252.646 126.665Z" fill="#AF1A1A"/>
@@ -276,13 +276,7 @@ function HomePage() {
               체계적인 식재료 관리로 식비는 절약하고, 매일의 요리는 더 즐겁게.<br />
               지금 바로 재료를 등록하고 요리를 시작해보세요.
             </p>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/fridge')}
-                className="bg-[#7A0000] text-white font-bold text-sm px-7 py-3 rounded-full hover:bg-[#600000] transition-colors"
-              >
-                시작하기
-              </button>
+            <div className="flex flex-col gap-3 items-center md:items-start">
               <span className="text-xs text-[#78716C] flex items-center gap-1">
                 {/* 체크 아이콘 */}
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -290,6 +284,12 @@ function HomePage() {
                 </svg>
                 식재료 유통기한 관리도 한번에 해보세요
               </span>
+              <button
+                onClick={() => navigate('/fridge')}
+                className="bg-[#7A0000] text-white font-bold text-sm px-7 py-3 rounded-full hover:bg-[#600000] transition-colors w-fit"
+              >
+                시작하기
+              </button>
             </div>
           </div>
         </div>

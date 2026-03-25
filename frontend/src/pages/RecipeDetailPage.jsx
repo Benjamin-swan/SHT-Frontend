@@ -13,6 +13,7 @@ function RecipeDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isSaved, setIsSaved] = useState(false)
+  const [copyDone, setCopyDone] = useState(false)
 
   useEffect(() => {
     const savedList = JSON.parse(localStorage.getItem('liked_recipes') || '[]')
@@ -38,6 +39,17 @@ function RecipeDetailPage() {
     return {
       steps: stepLines,
       tip: parts[1] ? parts[1].trim() : null
+    }
+  }
+
+  const handleShare = async () => {
+    if (copyDone) return
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopyDone(true)
+      setTimeout(() => setCopyDone(false), 2000)
+    } catch {
+      alert('링크 복사에 실패했습니다. 주소창에서 직접 복사해 주세요.')
     }
   }
 
@@ -130,6 +142,23 @@ function RecipeDetailPage() {
               >
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex-shrink-0 transition-opacity"
+              aria-label="레시피 링크 복사"
+              title={copyDone ? '링크가 복사되었습니다!' : '링크 복사'}
+            >
+              {copyDone ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A0000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              )}
             </button>
             <div className="flex items-center gap-1.5 bg-[#ECE8DD] px-3 py-1.5 rounded-full">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A0000" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>

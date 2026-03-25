@@ -159,7 +159,14 @@ function FridgePage() {
   const navigate = useNavigate()
 
   const [activeCategory, setActiveCategory] = useState(null)
-  const [ingredients, setIngredients] = useState([])
+  const [ingredients, setIngredients] = useState(() => {
+    try {
+      const saved = localStorage.getItem(FRIDGE_STORAGE_KEY)
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
   const [selected, setSelected] = useState(new Set())
   const [showModal, setShowModal] = useState(false)
 
@@ -169,16 +176,6 @@ function FridgePage() {
   const [editingIngredient, setEditingIngredient] = useState(null)
   // 세션 가져오기 진행 중 여부
   const [importingSession, setImportingSession] = useState(false)
-
-  // 마운트 시 localStorage에서 냉장고 재료 복원
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(FRIDGE_STORAGE_KEY)
-      if (saved) setIngredients(JSON.parse(saved))
-    } catch {
-      // 파싱 실패 시 빈 배열 유지
-    }
-  }, [])
 
   // ingredients가 바뀔 때마다 localStorage에 저장
   useEffect(() => {
@@ -284,7 +281,6 @@ function FridgePage() {
 
   const handleModalAdd = (ingredient) => {
     setIngredients((prev) => [...prev, ingredient])
-    setSelected((prev) => new Set(prev).add(ingredient.name))
   }
 
   const handleRecommend = () => {
