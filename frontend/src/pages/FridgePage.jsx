@@ -346,7 +346,7 @@ function FridgePage() {
 
         {/* 헤더: 타이틀 + (식재료 추가 버튼 + 모드 토글) */}
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-bold text-[#1C1C15]">내 냉장고</h1>
+          <h1 className="text-2xl font-bold text-[#1C1C15]">나의 냉장고</h1>
 
           {/* 우측: (세션 가져오기 버튼) + 식재료 추가 버튼 + 토글 — 같은 높이로 나란히 */}
           <div className="flex items-center gap-2">
