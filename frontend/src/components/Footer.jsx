@@ -87,7 +87,7 @@ function Footer() {
         {/* 하단: 저작권 */}
         <div className="border-t border-gray-100 pt-4">
           <p className="text-xs text-[#78716C] break-keep">
-            © 2026 Yorijori Culinary Curator. All rights reserved.
+            © 2026 Yorijori Culinary Curator. All rights reserved. v0.1.0
           </p>
         </div>
       </div>

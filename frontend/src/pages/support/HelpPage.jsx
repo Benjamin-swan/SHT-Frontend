@@ -21,7 +21,7 @@ function HelpPage() {
             <h2 className="text-lg font-bold text-[#7A0000] mb-3">2. 식재료는 어떻게 등록하나요?</h2>
             <p className="text-[#78716C] leading-relaxed text-sm">
               상단 메뉴의 <strong>나의 냉장고</strong> 탭으로 이동하시거나, 메인 화면의 기입란을 통해 재료를 등록할 수 있습니다.
-              음성 입력, 텍스트 입력 모두 지원하며, 등록된 재료의 신선도(유통기한) 역시 손쉽게 관리할 수 있습니다.
+              음성 입력, 텍스트 입력 모두 지원하며, 등록된 재료의 신선도(소비기한) 역시 손쉽게 관리할 수 있습니다.
             </p>
           </section>
 
@@ -37,7 +37,7 @@ function HelpPage() {
             <h2 className="text-lg font-bold text-[#7A0000] mb-3">4. AI 레시피의 분량은 몇 인분 기준인가요?</h2>
             <p className="text-[#78716C] leading-relaxed text-sm">
               기본적으로 <strong>1~2인분</strong>을 기준으로 계량이 안내됩니다. 
-              요리의 특성에 따라 계량의 차이가 있을 수 있으니, 요리 시 간을 보며 기호에 맞게 조절하시는 것을 권장합니다.
+              요리의 특성에 따라 계량의 차이가 있을 수 있으니, 요리 시간을 보며 기호에 맞게 조절하시는 것을 권장합니다.
             </p>
           </section>
         </div>
