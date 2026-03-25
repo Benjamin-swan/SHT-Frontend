@@ -30,7 +30,7 @@ function ContactPage() {
               </svg>
               <h3 className="text-lg font-bold text-[#1C1C15] mb-1">고객센터</h3>
               <p className="text-sm font-bold text-[#7A0000]">1588-0000</p>
-              <p className="text-xs text-[#78716C] mt-2">유선 연결이 어려울 경우 ই메일을 이용해주세요.</p>
+              <p className="text-xs text-[#78716C] mt-2">유선 연결이 어려울 경우 이메일을 이용해주세요.</p>
             </div>
           </div>
         </div>

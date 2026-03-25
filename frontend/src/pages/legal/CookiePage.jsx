@@ -10,7 +10,7 @@ function CookiePage() {
         
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col gap-6">
           <p className="text-[#78716C] leading-relaxed text-sm text-center mb-4">
-            요리조리(Yori-Jori)는 이용자에게 연속적이고 원활한 서비스를 제공하기 위해 <br/>브라우저의 쿠키(Cookie) 및 로컬 스토리지(Local Storage)를 운용합니다.
+            요리조리(YoriJori)는 이용자에게 연속적이고 원활한 서비스를 제공하기 위해 <br/>브라우저의 쿠키(Cookie) 및 로컬 스토리지(Local Storage)를 운용합니다.
           </p>
 
           <section>

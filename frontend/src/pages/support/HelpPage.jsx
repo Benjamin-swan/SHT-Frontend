@@ -10,7 +10,7 @@ function HelpPage() {
         
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col gap-8">
           <section>
-            <h2 className="text-lg font-bold text-[#7A0000] mb-3">1. 요리조리(Yori-Jori)는 어떤 서비스인가요?</h2>
+            <h2 className="text-lg font-bold text-[#7A0000] mb-3">1. 요리조리(YoriJori)는 어떤 서비스인가요?</h2>
             <p className="text-[#78716C] leading-relaxed text-sm">
               요리조리는 냉장고에 남은 식재료를 기반으로 최적의 레시피를 AI가 추천해주는 큐레이션 서비스입니다.
               사용자가 식재료를 입력하면, AI가 조합 가능한 요리를 분석하고 레시피를 생성하여 제안합니다.

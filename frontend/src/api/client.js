@@ -7,6 +7,7 @@ import axios from 'axios'
 // baseURL을 설정하면 각 요청에서 도메인 주소를 반복하지 않아도 됩니다.
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL, // .env의 VITE_API_BASE_URL 값을 사용
+  timeout: 70000, // 70초 (백엔드 LLM 호출 최대 60초 + 여유 10초)
 })
 
 // 브라우저 고유 UUID를 localStorage에서 읽거나, 없으면 최초 1회 생성합니다.
