@@ -8,9 +8,10 @@ import axios from 'axios'
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL, // .env의 VITE_API_BASE_URL 값을 사용
   timeout: 70000, // 70초 (백엔드 LLM 호출 최대 60초 + 여유 10초)
-  headers: {
-    'ngrok-skip-browser-warning': 'true', // ngrok 무료 브라우저 경고 페이지 우회
-  },
+
+
+
+  
 })
 
 // 브라우저 고유 UUID를 localStorage에서 읽거나, 없으면 최초 1회 생성합니다.
