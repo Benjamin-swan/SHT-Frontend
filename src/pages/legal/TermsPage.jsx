@@ -1,5 +1,5 @@
-import NavBar from '../../components/NavBar'
-import Footer from '../../components/Footer'
+import NavBar from '@shared/ui/NavBar'
+import Footer from '@shared/ui/Footer'
 
 function TermsPage() {
   return (

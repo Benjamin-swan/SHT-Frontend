@@ -39,43 +39,68 @@
 
 ---
 
-## 폴더 구조
+## 폴더 구조 (Feature-Sliced Design)
+
+**의존 방향**: `pages → features → shared` (역방향 import 금지)
 
 ```
-frontend/
-├── public/
+SHT-Frontend/
+├── public/                              # 정적 자산 (favicon, icons, images)
 ├── src/
-│   ├── main.jsx                  # 앱 진입점
-│   ├── App.jsx                   # 라우터 설정
-│   ├── pages/
-│   │   ├── InputPage.jsx         # 식재료 입력 (FE-1,2,3)
-│   │   ├── RecipeListPage.jsx    # 추천 레시피 목록 (FE-4,6,7,8)
-│   │   └── RecipeDetailPage.jsx  # 레시피 상세 (FE-5,6)
-│   ├── components/
-│   │   ├── IngredientButton.jsx  # 식재료 버튼 (FE-1,2)
-│   │   ├── FreshnessButton.jsx   # 유통기한 버튼 (FE-3)
-│   │   ├── RecipeCard.jsx        # 레시피 카드 (FE-6)
-│   │   ├── RecipeDetail.jsx      # 상세 레시피 (FE-5,6)
-│   │   └── RecentRecipes.jsx     # 최근 본 레시피 (FE-8)
-│   ├── api/
-│   │   └── client.js             # axios 인스턴스 + API 함수 모음
-│   ├── hooks/
-│   │   └── useRecentRecipes.js   # localStorage 훅 (FE-8)
-│   └── constants/
-│       └── ingredients.js        # 빈출 식재료 10종 상수
-├── .env                          # 환경변수 (git 제외)
-├── .env.example                  # 환경변수 예시 (git 포함)
+│   ├── main.jsx                         # 앱 진입점
+│   ├── app/                             # 앱 셸 — 라우팅, 전역 스타일
+│   │   ├── App.jsx                      # BrowserRouter + Routes
+│   │   └── styles/index.css             # Tailwind entry
+│   ├── pages/                           # 라우트 진입점 (얇게 — 조립만)
+│   │   ├── HomePage.jsx
+│   │   ├── FridgePage.jsx               # 나의 냉장고
+│   │   ├── RecipeListPage.jsx           # 추천 목록
+│   │   ├── RecipeDetailPage.jsx         # 레시피 상세
+│   │   ├── SavedPage.jsx                # 저장된 레시피
+│   │   ├── legal/                       # 약관·개인정보·쿠키
+│   │   └── support/                     # 고객지원·안전·문의
+│   ├── features/                        # 도메인별 자급자족 (UI + 훅 + API)
+│   │   ├── ingredient/
+│   │   │   ├── components/AddIngredientModal.jsx
+│   │   │   └── api.js                   # 재료 도메인 엔드포인트
+│   │   └── recipe/
+│   │       ├── hooks/useRecentRecipes.js
+│   │       └── api.js                   # 레시피 도메인 엔드포인트
+│   └── shared/                          # 도메인 비종속 공용
+│       ├── api/http.js                  # axios 인스턴스 + browser_uuid/session_id
+│       ├── ui/                          # NavBar, Footer, ScrollToTop
+│       └── assets/                      # 공용 이미지·아이콘
+├── .env                                 # 환경변수 (git 제외)
+├── .env.example                         # 환경변수 예시 (git 포함)
+├── jsconfig.json                        # 경로 별칭 IDE 인텔리센스
+├── vite.config.js                       # 경로 별칭 정의
 └── package.json
 ```
+
+### 경로 별칭 (vite.config.js + jsconfig.json)
+
+| 별칭         | 실제 경로        | 용도                                    |
+|--------------|------------------|-----------------------------------------|
+| `@/`         | `src/`           | 전역 진입                                |
+| `@app/`      | `src/app/`       | 앱 셸 (App, 라우터, 글로벌 스타일)        |
+| `@pages/`    | `src/pages/`     | 라우트 페이지                             |
+| `@features/` | `src/features/`  | 도메인 모듈 (`@features/recipe/api`)     |
+| `@shared/`   | `src/shared/`    | 공용 (`@shared/ui/NavBar`, `@shared/api/http`) |
+
+**규칙**: 한 파일 안에서 `../` 두 번 이상 올라가면 별칭으로 교체할 것.
 
 ---
 
 ## 페이지 라우팅
 
 ```
-/                →  InputPage          (식재료 입력)
+/                →  HomePage           (메인 — 검색 + 최근 레시피 + 냉장고 CTA)
+/fridge          →  FridgePage         (나의 냉장고 — 재료 등록/관리)
 /recipes         →  RecipeListPage     (추천 목록)
 /recipes/:id     →  RecipeDetailPage   (레시피 상세)
+/saved           →  SavedPage          (저장된 레시피)
+/legal/{terms,privacy,cookie}          (약관·개인정보·쿠키)
+/support/{help,safety,contact}         (도움말·안전·문의)
 ```
 
 ---
@@ -83,7 +108,7 @@ frontend/
 ## 환경변수
 
 ```
-# frontend/.env (git 제외)
+# SHT-Frontend/.env (git 제외)
 VITE_API_BASE_URL=http://localhost:8000
 ```
 
@@ -160,29 +185,41 @@ VITE_API_BASE_URL=http://localhost:8000
 
 ---
 
-## axios client.js 기본 구조
+## API 레이어 구조 (도메인별 분리)
+
+axios 인스턴스는 `@shared/api/http.js` 한 곳에서만 만들고, 엔드포인트는
+도메인별로 `@features/<domain>/api.js` 에 둡니다. 컴포넌트는 항상
+도메인 API 모듈을 import 하고, 절대 axios 를 직접 import 하지 않습니다.
 
 ```javascript
-// src/api/client.js
+// src/shared/api/http.js — 인스턴스 + 익명 식별
 import axios from 'axios'
-
-const client = axios.create({
+export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
+  timeout: 70000,
 })
+export const getBrowserUUID = () => { /* localStorage 1회 생성 */ }
+export const ensureSessionId = () => { /* 없으면 새로 발급 */ }
+```
 
-export const getIngredients = () =>
-  client.get('/ingredients')
+```javascript
+// src/features/recipe/api.js
+import { http, ensureSessionId } from '@shared/api/http'
 
-export const recommendRecipes = (ingredients, session_id) =>
-  client.post('/recipes/recommend', { ingredients, session_id })
+export const recommendRecipes = (ingredient_names) =>
+  http.post('/recipes/recommend', { ingredient_names })
 
-export const getRecipeDetail = (id) =>
-  client.get(`/recipes/${id}`)
+export const logRecipeInteraction = (recipe_id, event_type = 'recipe_click') => {
+  const session_id = ensureSessionId()
+  return http
+    .post('/logs/interaction', { session_id, recipe_id, event_type })
+    .catch(() => {}) // silent fail
+}
+```
 
-export const logEvent = (payload) =>
-  client.post('/logs/event', payload).catch(() => {})  // silent fail
-
-export default client
+```javascript
+// src/pages/RecipeListPage.jsx
+import { logRecipeInteraction } from '@features/recipe/api'
 ```
 
 ---
@@ -190,8 +227,10 @@ export default client
 ## 개발 규칙
 
 ### 코드 작성 원칙
-- **DRY**: 중복 로직은 반드시 훅(`hooks/`) 또는 유틸 함수로 분리
-- **컴포넌트 분리**: 페이지 파일(`pages/`)에는 레이아웃과 상태 관리만, 세부 UI는 `components/`로 분리
+- **DRY**: 중복 로직은 도메인 훅(`@features/<domain>/hooks/`) 또는 `@shared/lib/` 유틸로 분리
+- **컴포넌트 분리**: `pages/`는 레이아웃·라우팅·상태 조립만, 도메인 UI는 `@features/<domain>/components/`, 도메인 비종속 UI는 `@shared/ui/`
+- **import 별칭**: `../`, `../../` 같은 상대경로 대신 항상 `@app/@pages/@features/@shared` 사용
+- **axios 직접 import 금지**: 컴포넌트는 도메인 API 모듈(`@features/<domain>/api`)만 import
 - **Props 명확화**: 컴포넌트 props는 역할이 명확하도록 네이밍
 - **에러 처리**: API 호출 시 로딩/에러 상태를 텍스트로 반드시 표시
 - **로그 이벤트**: `POST /logs/event`는 항상 silent fail (실패해도 페이지 이동 중단 금지)

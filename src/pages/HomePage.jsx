@@ -3,10 +3,10 @@
 // 구성: Hero(검색) → 최근 본 레시피 슬라이더 → 냉장고 관리 CTA 배너 → Footer
 import { useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import NavBar from '../components/NavBar'
-import Footer from '../components/Footer'
-import useRecentRecipes from '../hooks/useRecentRecipes'
-import { recommendRecipes } from '../api/client'
+import NavBar from '@shared/ui/NavBar'
+import Footer from '@shared/ui/Footer'
+import useRecentRecipes from '@features/recipe/hooks/useRecentRecipes'
+import { recommendRecipes } from '@features/recipe/api'
 
 // 최근 본 레시피가 없을 때 보여줄 플레이스홀더 카드 데이터
 const PLACEHOLDER_RECIPES = [

@@ -3,10 +3,10 @@
 // FridgePage에서 navigate state로 recipes 배열을 받아 카드 형태로 렌더링합니다.
 // 카드 클릭 시 레시피 상세 페이지로 이동하고, 클릭 이벤트 로그를 전송합니다.
 import { useLocation, useNavigate } from 'react-router-dom'
-import NavBar from '../components/NavBar'
-import Footer from '../components/Footer'
-import useRecentRecipes from '../hooks/useRecentRecipes'
-import { logRecipeInteraction } from '../api/client'
+import NavBar from '@shared/ui/NavBar'
+import Footer from '@shared/ui/Footer'
+import useRecentRecipes from '@features/recipe/hooks/useRecentRecipes'
+import { logRecipeInteraction } from '@features/recipe/api'
 
 function RecipeListPage() {
   const location = useLocation()

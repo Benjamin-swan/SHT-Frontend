@@ -5,9 +5,9 @@
 // - 관리 모드(우): 재료를 클릭하면 수정·삭제 패널이 열림
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import NavBar from '../components/NavBar'
-import AddIngredientModal from '../components/AddIngredientModal'
-import { getSessionIngredients, updateIngredientFreshness } from '../api/client'
+import NavBar from '@shared/ui/NavBar'
+import AddIngredientModal from '@features/ingredient/components/AddIngredientModal'
+import { getSessionIngredients, updateIngredientFreshness } from '@features/ingredient/api'
 
 // localStorage에 저장할 키
 const FRIDGE_STORAGE_KEY = 'fridge_ingredients'
