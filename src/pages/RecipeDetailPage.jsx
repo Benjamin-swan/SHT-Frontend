@@ -1,9 +1,9 @@
 // src/pages/RecipeDetailPage.jsx
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import NavBar from '../components/NavBar'
-import Footer from '../components/Footer'
-import { getRecipeDetail, logRecipeInteraction } from '../api/client'
+import NavBar from '@shared/ui/NavBar'
+import Footer from '@shared/ui/Footer'
+import { getRecipeDetail, logRecipeInteraction } from '@features/recipe/api'
 
 function RecipeDetailPage() {
   const { id } = useParams()

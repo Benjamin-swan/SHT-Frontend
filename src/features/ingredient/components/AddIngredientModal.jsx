@@ -2,7 +2,7 @@
 // 나의 냉장고 페이지에서 재료를 직접 입력할 때 나타나는 바텀 시트 모달입니다.
 // 아래에서 위로 슬라이드 업 애니메이션으로 등장하며, 배경은 블러 처리됩니다.
 import { useState, useEffect } from 'react'
-import { createIngredient, logIngredientEvent } from '../api/client'
+import { createIngredient, logIngredientEvent } from '@features/ingredient/api'
 
 const CATEGORY_OPTIONS = [
   { label: '곡물·면·빵', value: 'grain' },

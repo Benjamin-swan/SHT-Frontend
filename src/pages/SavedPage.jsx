@@ -3,9 +3,9 @@
 // 레시피가 일정 수 이상 쌓이면 페이지네이션(이전/다음)으로 나눠서 보여줍니다.
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import NavBar from '../components/NavBar'
-import Footer from '../components/Footer'
-import { getInteractionLogs } from '../api/client'
+import NavBar from '@shared/ui/NavBar'
+import Footer from '@shared/ui/Footer'
+import { getInteractionLogs } from '@features/recipe/api'
 
 // 한 페이지에 보여줄 레시피 수
 // 웹(lg 이상): 3열 × 3행 = 9개 / 모바일: 1열 × 6행 = 6개
